@@ -26,6 +26,8 @@ bash /tmp/mongodb-migration-verify.sh collect /tmp/mongo5-counts.txt
 kubectl cp -n connections mongo5-0:/tmp/mongo5-counts.txt . -c mongo5
 ----
 
+Now shutdown mongo5 (or deploy the infrastructure update) and migrate the persistent volumes. Then run the migration script, after the migration has finished, check the documents in `mongo7`.
+
 .Copy script and result to `mongo7-0`
 [source,bash]
 ----
