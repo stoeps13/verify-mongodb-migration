@@ -1,0 +1,71 @@
+= Verify MongoDB migration
+
+.Copy the `mongodb-migration-verify.sh` to `mongo5-0`
+[source,bash]
+----
+kubectl cp -n connections mongodb-migration-verify.sh mongo5-0:/tmp/ -c mongo5
+----
+
+.Run a shell in `mongo5-0`:
+[source,bash]
+----
+kubectl exec -n connections -it mongo5-0 -c mongo5 -- bash
+----
+
+.Run collect on `mongo5-0`
+[source,bash]
+----
+cd /tmp
+MONGO_HOST="mongo5-0.mongo5.connections.svc.cluster.local" \
+bash /tmp/mongodb-migration-verify.sh collect /tmp/mongo5-counts.txt
+----
+
+.Copy result to local directory
+[source,bash]
+----
+kubectl cp -n connections mongo5-0:/tmp/mongo5-counts.txt . -c mongo5
+----
+
+.Copy script and result to `mongo7-0`
+[source,bash]
+----
+kubectl cp -n connections mongodb-migration-verify.sh mongo7-0:/tmp/ -c mongo7
+kubectl cp -n connections mongo7-0:/tmp/mongo5-counts.txt . -c mongo7
+----
+
+.Run a shell in `mongo7-0`:
+[source,bash]
+----
+kubectl exec -n connections -it mongo7-0 -c mongo7 -- bash
+----
+
+.Verify documents in `mongo7-0`
+[source,bash]
+----
+cd /tmp
+MONGO_HOST="mongo7-0.mongo7.connections.svc.cluster.local" \
+bash /tmp/mongodb-migration-verify.sh verify /tmp/mongo5-counts.txt
+----
+
+.Output (here tested with 7.0 for collect and verify)
+[source,bash]
+----
+...
+==============================
+Migration Verification Summary
+==============================
+MongoDB Version: 7.0.12 → 7.0.12
+Databases: 10/11 matched
+Collections: 54/55 matched
+
+Mismatched Collections:
+----------------------
+boards-user.x-clientmigrations: 0 → 1 (+1)
+
+==============================
+❌ MIGRATION VERIFICATION FAILED
+   1 collection(s) have issues
+==============================
+
+Detailed results saved to: migration-verification-20250429122523.txt
+----
