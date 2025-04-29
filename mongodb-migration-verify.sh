@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Author: Christoph Stoettner
+# Copyright: Christoph Stoettner
+# License: Apache 2.0
+#
 # MongoDB Migration Verification Minimal Shell Script
 #
 # This script operates in two phases without requiring jq or Python:
